@@ -1,4 +1,0 @@
-gatekeeper_project
-==================
-
-GATEKEEPER

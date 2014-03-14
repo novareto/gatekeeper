@@ -28,8 +28,10 @@ from zope.location import Location
 from zope.schema import TextLine, Password
 from cromlech.sqlalchemy import create_engine, SQLAlchemySession
 from .admin import get_valid_messages, Admin
-from . import SESSION_KEY
+from . import SESSION_KEY, log
 from .portals import IPortal
+from cromlech.browser import PublicationBeginsEvent, PublicationEndsEvent
+from zope.event import notify
 
 
 timeout_template = get_template('timeout.pt', __file__)
@@ -104,6 +106,7 @@ def read_bauth(val):
 @implementer(IPublicationRoot)
 class BaseRoot(Location):
     """ """
+
 
 @implementer(IPublicationRoot)
 class LoginRoot(Location):
@@ -187,8 +190,12 @@ class BaseLoginForm(Form):
         for name, gate in gates:
             try:
                 if gate.check_authentication(login, password):
+                    log("%s successfully logged in %s" % (login, gate))
                     authenticated_for.add(name)
+                else:
+                    log("%s failed to logged in %s" % (login, gate))
             except socket.error:
+                self.flash(u'Das Zielsystem ist wegen Wartungsarbeiten momentan nicht erreichbar')
                 print "%r could not be resolved" % name
         return authenticated_for
 
@@ -220,8 +227,10 @@ def login(global_conf, pkey, dest, dburl, dbkey, **kwargs):
         session = environ[SESSION_KEY].session
         setSession(session)
         request = Request(environ)
+        notify(PublicationBeginsEvent(root, request))
         form = getMultiAdapter((root, request), Interface, u'loginform')
         response = form()(environ, start_response)
+        notify(PublicationEndsEvent(root, request, response))
         setSession()
         return response
     return app

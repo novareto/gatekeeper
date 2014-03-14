@@ -13,12 +13,11 @@ from cromlech.configuration.utils import load_zcml
 from cromlech.i18n import register_allowed_languages
 from cromlech.sqlalchemy import SQLAlchemySession, create_engine
 from cromlech.webob.request import Request
-from grokcore.component import global_utility
-from zope.component import getUtility
+from zope.component import getUtility, getUtilitiesFor
 from zope.component import getGlobalSiteManager
 from zope.location import Location
 
-from . import SESSION_KEY
+from . import SESSION_KEY, log
 from .login import read_bauth
 from .portals import IPortal, XMLRPCPortal
 from .admin import Admin, get_valid_messages
@@ -60,7 +59,7 @@ class GateKeeper(Location):
                 "title": gateway.title,
                 "url": gateway.backurl,
                 "dashboard": gateway.get_dashboard(user),
-                }
+            }
 
     def get_messages(self):
         with SQLAlchemySession(self.engine) as session:
@@ -91,6 +90,9 @@ def keeper(global_conf, pubkey, dburl,
             xmlutil = XMLRPCPortal(
                 portal['inner'], portal['title'], portal['outer'])
             getGlobalSiteManager().registerUtility(xmlutil, IPortal, name=name)
+
+    for portal in getUtilitiesFor(IPortal):
+        log("Available Portal %s" % portal[0])
 
     allowed = langs.strip().replace(',', ' ').split()
     register_allowed_languages(allowed)

@@ -102,6 +102,10 @@ def read_bauth(val):
 
 
 @implementer(IPublicationRoot)
+class BaseRoot(Location):
+    """ """
+
+@implementer(IPublicationRoot)
 class LoginRoot(Location):
 
     def __init__(self, pkey, dest, dburl, dbkey):
@@ -224,18 +228,22 @@ def login(global_conf, pkey, dest, dburl, dbkey, **kwargs):
 
 
 def timeout(global_conf, **kwargs):
+    root = BaseRoot()
+
     def app(environ, start_response):
         request = Request(environ)
-        view = getMultiAdapter((environ, request), IView, name="timeout")
+        view = getMultiAdapter((root, request), IView, name="timeout")
         response = view()
         return response(environ, start_response)
     return app
 
 
 def unauthorized(global_conf, **kwargs):
+    root = BaseRoot()
+
     def app(environ, start_response):
         request = Request(environ)
-        view = getMultiAdapter((environ, request), IView, name="unauthorized")
+        view = getMultiAdapter((root, request), IView, name="unauthorized")
         response = view()
         return response(environ, start_response)
     return app

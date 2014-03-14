@@ -33,6 +33,7 @@ setup(name='gatekeeper',
           "uvclight[sql]",
           "wsgistate",
           "dolmen.forms.crud",
+          "cromlech.wsgistate",
       ],
       entry_points={
          'paste.app_factory': [

@@ -2,29 +2,32 @@
 
 import datetime
 import transaction
-from . import SESSION_KEY
-from cromlech.security import Interaction
-from cromlech.browser import IPublicationRoot
-from cromlech.browser import setSession
-from cromlech.dawnlight import ViewLookup
-from cromlech.dawnlight import traversable, DawnlightPublisher
-from cromlech.sqlalchemy import create_and_register_engine
-from cromlech.sqlalchemy import SQLAlchemySession
+from barrel import cooper
+
+from . import SESSION_KEY, i18n as _
+
+from cromlech.dawnlight import DawnlightPublisher, ViewLookup
+from cromlech.i18n.utils import setLanguage
 from cromlech.webob import Request
-from dolmen.content import schema
 from dolmen.sqlcontainer import SQLContainer
-from dolmen.view import query_view
-from grokcore.security import require
+
+from uvclight import query_view, require, traversable
+from uvclight import setSession, IRootObject, Interaction
+
 from sqlalchemy import Column, Text, Integer, DateTime, String
 from sqlalchemy.ext.declarative import declarative_base
+from uvclight.backends.sql import SQLAlchemySession, create_and_register_engine
+
+import zope.schema
 from zope.interface import Interface, implementer
 from zope.location import Location
-import zope.schema
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
-from cromlech.dawnlight import query_view
 
 
-view_lookup = ViewLookup(query_view)
+def query(request, obj, name):
+    return query_view(request, obj, name=name)
+
+view_lookup = ViewLookup(query)
 
 Admin = declarative_base()
 
@@ -39,17 +42,24 @@ ENABLED = u"enabled"
 
 
 MODES = SimpleVocabulary((
-    SimpleTerm(title="Always", value=ENABLED),
-    SimpleTerm(title="Time span", value=ON_DATES),
-    SimpleTerm(title="Disabled", value=DISABLED),
+    SimpleTerm(title=_("Always", default="Always"), value=ENABLED),
+    SimpleTerm(title=_("Time span", default="Time span"), value=ON_DATES),
+    SimpleTerm(title=_("Disabled", default="Disabled"), value=DISABLED),
     ))
 
 
 TYPES = SimpleVocabulary((
-    SimpleTerm(title=u"Alert", value=ALERT),
-    SimpleTerm(title=u"Information", value=INFO),
-    SimpleTerm(title=u"Advertisement", value=ADVERT),
+    SimpleTerm(title=_("Alert", default="Alert"), value=ALERT),
+    SimpleTerm(title=_("Info", default="Information"), value=INFO),
+    SimpleTerm(title=_("Ad", default="Advertisment"), value=ADVERT),
     ))
+
+
+styles = {
+    ALERT: u"alert alert-error",
+    INFO: u"alert",
+    ADVERT: u"alert alert-info",
+    }
 
 
 def now():
@@ -59,39 +69,38 @@ def now():
 class IMessage(Interface):
 
     id = zope.schema.Int(
-        title=u"Unique identifier",
+        title=_("Unique identifier"),
         readonly=True,
         required=True)
 
     message = zope.schema.Text(
-        title=u"Message",
+        title=_("Message"),
         required=True)
 
     type = zope.schema.Choice(
-        title=u"Type of message",
+        title=_("Type of message"),
         vocabulary=TYPES,
         default=INFO,
         required=True)
 
     activation = zope.schema.Choice(
-        title=u"Type of message",
+        title=_("Method of activation"),
         vocabulary=MODES,
         default=ON_DATES,
         required=True)
 
     enable = zope.schema.Datetime(
-        title=u"Date of activation",
-        description=u"Set empty for an immediate activation",
+        title=_(u"Date of activation"),
+        description=_(u"Set empty for an immediate activation"),
         required=False)
 
     disable = zope.schema.Datetime(
-        title=u"Date of de-activation",
-        description=u"Set empty for an immediate de-activation",
+        title=_(u"Date of de-activation"),
+        description=_(u"Set empty for an immediate de-activation"),
         required=False)
 
 
 class Message(Location, Admin):
-    schema(IMessage)
     require('zope.Public')
 
     __tablename__ = 'messages'
@@ -108,7 +117,7 @@ class MessagesRoot(SQLContainer):
     factory = model = Message
 
 
-@implementer(IPublicationRoot)
+@implementer(IRootObject)
 class AdminRoot(Location):
     traversable('messages')
 
@@ -126,6 +135,12 @@ def get_valid_messages(session):
     return iter(enabled.union(valid))
 
 
+admins = [
+    ('admin', 'admin'),
+    ]
+
+REALM = "sso.novareto.de"
+    
 def admin(global_conf, dburl, dbkey, pkey, **kwargs):
 
     engine = create_and_register_engine(dburl, dbkey)
@@ -135,9 +150,11 @@ def admin(global_conf, dburl, dbkey, pkey, **kwargs):
     root = AdminRoot(pkey, dbkey)
     publisher = DawnlightPublisher(view_lookup=view_lookup)
 
+    @cooper.basicauth(users=admins, realm=REALM)
     def app(environ, start_response):
         session = environ[SESSION_KEY].session
         setSession(session)
+        setLanguage('de')
         request = Request(environ)
         with Interaction():
             with transaction.manager as tm:

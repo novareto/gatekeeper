@@ -59,7 +59,7 @@ class ILoginForm(Interface):
 
 
 class DirectResponse(Exception):
-    
+
     def __init__(self, response):
         self.response = response
 
@@ -102,6 +102,7 @@ class LogMe(Action):
             extra_fields=(('bauth', val),))
 
         back = form.request.form.get('form.field.back', back)
+        back = form.request.form.get('back', back)
         res = HTTPFound(location=back)
         res.set_cookie('auth_pubtkt', quote(ticket), path='/',
                        domain='novareto.de', secure=False)
@@ -122,6 +123,9 @@ class LogMe(Action):
             send(_(u'Login successful.'))
             res = self.cook(
                 form, login, password, authenticated_for, form.context.dest)
+            print "-" * 44
+            print res
+            print "-" * 44
             raise DirectResponse(res)
         else:
             sent = send(_(u'Login failed.'))
@@ -165,6 +169,7 @@ class BaseLoginForm(Form):
             self.updateForm()
             result = self.render(*args, **kwargs)
             return self.make_response(result, *args, **kwargs)
+
         except HTTPRedirect, exc:
             return redirect_exception_response(self.responseFactory, exc)
         except DirectResponse, exc:

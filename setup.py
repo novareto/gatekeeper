@@ -33,6 +33,7 @@ setup(name='gatekeeper',
           "setuptools",
           "uvclight[sql]",
           "wsgistate",
+          'cookiecutter',
       ],
       entry_points={
          'paste.app_factory': [

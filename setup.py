@@ -45,5 +45,8 @@ setup(name='gatekeeper',
          'paste.filter_factory': [
              'global_config = gatekeeper.utils:configuration',
          ],
+        'console_scripts': [
+            'gatekeeper_project = gatekeeper.scripts:main',
+        ],
       }
       )

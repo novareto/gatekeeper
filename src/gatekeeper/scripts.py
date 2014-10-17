@@ -16,6 +16,7 @@ from cookiecutter.main import (prompt_for_config,
 def parse_cookiecutter_args(args):
     """ Parse the command-line arguments to Cookiecutter. """
     parser = _get_parser()
+    import pdb; pdb.set_trace()
     parser.add_argument(
         'output_dir',
         help='Base Output Directory'
@@ -69,13 +70,11 @@ def main(v=None):  # FIXME Buildout Argument CRAP
         cookiecutter_dict = prompt_for_config(context)
         context['cookiecutter'] = cookiecutter_dict
 
-    # Create project from local context and project template.
     generate_files(
         repo_dir=repo_dir,
         context=context,
         output_dir=args.output_dir,
     )
-    #import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':

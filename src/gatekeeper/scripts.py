@@ -8,8 +8,19 @@ import uuid
 import os.path
 import logging
 
-from cookiecutter.main import (parse_cookiecutter_args, cookiecutter,
-                               get_user_config, generate_context)
+from cookiecutter.main import (prompt_for_config,
+                               get_user_config, _get_parser, generate_context,
+                               generate_files, clone)
+
+
+def parse_cookiecutter_args(args):
+    """ Parse the command-line arguments to Cookiecutter. """
+    parser = _get_parser()
+    parser.add_argument(
+        'output_dir',
+        help='Base Output Directory'
+    )
+    return parser.parse_args(args)
 
 
 def main(v=None):  # FIXME Buildout Argument CRAP
@@ -27,42 +38,43 @@ def main(v=None):  # FIXME Buildout Argument CRAP
         )
     secret = str(uuid.uuid4()).replace('-', '')[:16]
     extra_context = {
-        'path':
-        '/'.join(os.path.realpath(args.input_dir).split('/')[:-1]),
+        'path': args.output_dir,
         'secret': secret,
     }
-    cookiecutter(
-        args.input_dir,
-        args.checkout,
-        args.no_input,
-        extra_context=extra_context
+
+    input_dir = args.input_dir
+    checkout = args.checkout
+    no_input = args.no_input
+
+    config_dict = get_user_config()
+
+    if "git@" in input_dir or "https://" in input_dir:
+        repo_dir = clone(
+            repo_url=input_dir,
+            checkout=checkout,
+            clone_to_dir=config_dict['cookiecutters_dir']
+        )
+    else:
+        repo_dir = input_dir
+
+    context_file = os.path.join(repo_dir, 'cookiecutter.json')
+    logging.debug('context_file is {0}'.format(context_file))
+
+    context = generate_context(
+        context_file=context_file,
+        default_context=config_dict['default_context'],
+        extra_context=extra_context,
     )
+    if not no_input:
+        cookiecutter_dict = prompt_for_config(context)
+        context['cookiecutter'] = cookiecutter_dict
 
-
-    ### Reading the Config a 2'nd time to have access to the context in the
-    ### VHOST Script
-    #input_dir = args.input_dir
-    #checkout = args.checkout
-
-    #config_dict = get_user_config()
-    #
-    #if "git@" in input_dir or "https://" in input_dir:
-    #    repo_dir = clone(
-    #        repo_url=input_dir,
-    #        checkout=checkout,
-    #        clone_to_dir=config_dict['cookiecutters_dir']
-    #    )
-    #else:
-    #    repo_dir = input_dir
-
-    #context_file = os.path.join(repo_dir, 'cookiecutter.json')
-    #logging.debug('context_file is {0}'.format(context_file))
-
-    #context = generate_context(
-    #    context_file=context_file,
-    #    default_context=config_dict['default_context'],
-    #    extra_context=extra_context,
-    #)
+    # Create project from local context and project template.
+    generate_files(
+        repo_dir=repo_dir,
+        context=context,
+        output_dir=args.output_dir,
+    )
     #import pdb; pdb.set_trace()
 
 

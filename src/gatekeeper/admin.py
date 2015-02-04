@@ -11,8 +11,10 @@ from cromlech.i18n.utils import setLanguage
 from cromlech.webob import Request
 from dolmen.sqlcontainer import SQLContainer
 
-from uvclight import query_view, require, traversable
-from uvclight import setSession, IRootObject, Interaction
+from uvclight.auth import require
+from uvclight import query_view, traversable
+from uvclight import setSession, IRootObject
+from ul.auth.app import Interaction
 
 from sqlalchemy import Column, Text, Integer, DateTime, String
 from sqlalchemy.ext.declarative import declarative_base

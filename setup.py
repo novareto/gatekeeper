@@ -33,7 +33,7 @@ setup(name='gatekeeper',
           "setuptools",
           "uvclight[sql]",
           "wsgistate",
-          'cookiecutter',
+          "ul.auth",
       ],
       entry_points={
          'paste.app_factory': [
@@ -46,8 +46,5 @@ setup(name='gatekeeper',
          'paste.filter_factory': [
              'global_config = gatekeeper.utils:configuration',
          ],
-        'console_scripts': [
-            'gatekeeper_project = gatekeeper.scripts:main',
-        ],
       }
       )

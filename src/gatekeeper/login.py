@@ -15,6 +15,7 @@ from cromlech.browser import IView
 from cromlech.webob import Request
 from cromlech.sqlalchemy import create_engine, SQLAlchemySession
 from cromlech.i18n.utils import setLanguage
+from cromlech.browser import PublicationBeginsEvent, PublicationEndsEvent
 
 from dolmen.message import send
 from dolmen.forms.base.markers import HIDDEN
@@ -33,6 +34,7 @@ from zope.schema import TextLine, Password
 from .admin import get_valid_messages, Admin, styles
 from . import SESSION_KEY, i18n as _, ticket as tlib
 from .portals import IPortal
+from zope.event import notify
 
 timeout_template = get_template('timeout.pt', __file__)
 unauthorized_template = get_template('unauthorized.pt', __file__)
@@ -184,8 +186,10 @@ def login(global_conf, pkey, dest, dburl, dbkey, **kwargs):
         session = environ[SESSION_KEY].session
         setSession(session)
         request = Request(environ)
+        notify(PublicationBeginsEvent(root, request))
         form = query_view(request, root, name=u'loginform')
         response = form()(environ, start_response)
+        notify(PublicationEndsEvent(root, request, response))
         setSession()
         return response
     return app

@@ -74,7 +74,7 @@ def keeper(global_conf, pubkey, dburl,
 
     def publisher(environ, start_response):
 
-        @tlib.signed_cookie(pubkey)
+        @tlib.signed_cookie(pubkey, cipher_key)
         def publish(request, root):
             view = uvclight.query_view(request, site, name=u'index')
             if view is not None:

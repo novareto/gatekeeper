@@ -11,12 +11,16 @@ from cromlech.i18n.utils import setLanguage
 from cromlech.webob import Request
 from dolmen.sqlcontainer import SQLContainer
 
-from uvclight import query_view, require, traversable
-from uvclight import setSession, IRootObject, Interaction
+from uvclight import query_view
+from uvclight.directives import traversable
+from uvclight import setSession, IRootObject
+from uvclight.backends.sql import SQLAlchemySession, create_and_register_engine
+
+from cromlech.security import Interaction
+from ul.auth import require
 
 from sqlalchemy import Column, Text, Integer, DateTime, String
 from sqlalchemy.ext.declarative import declarative_base
-from uvclight.backends.sql import SQLAlchemySession, create_and_register_engine
 
 import zope.schema
 from zope.interface import Interface, implementer
@@ -26,6 +30,7 @@ from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
 def query(request, obj, name):
     return query_view(request, obj, name=name)
+
 
 view_lookup = ViewLookup(query)
 

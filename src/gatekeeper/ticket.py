@@ -193,14 +193,18 @@ def create_ticket(privkey, uid, validuntil, ip=None, tokens=(),
     return v
 
 
-aes = AESCipher('mKaqGWwAVNnthL6J')
+def cipher(app, global_conf, cipher_key=None):
+    def cipher_layer(environ, start_response):
+        environ['aes_cipher'] = AESCipher(cipher_key)
+        return app(environ, start_response)
+    return cipher_layer
 
 
-def bauth(val):
+def bauth(aes, val):
     return aes.encrypt(val)
 
 
-def read_bauth(val):
+def read_bauth(aes, val):
     return aes.decrypt(base64.b64decode(val))
 
 
@@ -217,7 +221,8 @@ class signed_cookie(object):
                 fields = parse_ticket(myticket, self.pubkey)
 
                 # we get the basic auth elements
-                auth = read_bauth(fields['bauth'])
+                auth = read_bauth(
+                    request.environment['aes_cipher'], fields['bauth'])
                 user, password = auth.split(':', 1)
 
                 # we get the working portals

@@ -85,7 +85,6 @@ class LoginRoot(Location):
                 for m in self.get_base_messages()]
 
 
-
 class LogMe(Action):
 
     def available(self, form):
@@ -93,7 +92,11 @@ class LogMe(Action):
 
     def cook(self, form, login, password, authenticated_for, back):
         privkey = tlib.read_key(form.context.pkey)
-        val = base64.b64encode(tlib.bauth('%s:%s' % (login, password)))
+        val = base64.b64encode(
+            lib.bauth(
+                form.request.environment['aes_cipher'],
+                '%s:%s' % (login, password))
+        )
         #val = val.replace('\n', '', 1)
         validtime = datetime.datetime.now() + datetime.timedelta(hours=1)
         validuntil = int(time.mktime(validtime.timetuple()))

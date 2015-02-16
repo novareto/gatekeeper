@@ -32,6 +32,7 @@ setup(name='gatekeeper',
           "js.bootstrap",
           "setuptools",
           "uvclight[sql]",
+          "uvclight[auth]",
           "wsgistate",
       ],
       entry_points={
@@ -44,6 +45,9 @@ setup(name='gatekeeper',
          ],
          'paste.filter_factory': [
              'global_config = gatekeeper.utils:configuration',
+         ],
+         'paste.filter_app_factory': [
+             'cipher = gatekeeper.ticket:cipher',
          ],
       }
       )

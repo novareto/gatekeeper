@@ -23,9 +23,10 @@ from sqlalchemy import Column, Text, Integer, DateTime, String
 from sqlalchemy.ext.declarative import declarative_base
 
 import zope.schema
-from zope.interface import Interface, implementer
+from zope.interface import Interface, implementer, alsoProvides
 from zope.location import Location
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
+from uvc.themes.btwidgets import IBootstrapRequest
 
 
 def query(request, obj, name):
@@ -145,7 +146,8 @@ admins = [
     ]
 
 REALM = "sso.novareto.de"
-    
+
+
 def admin(global_conf, dburl, dbkey, pkey, **kwargs):
 
     engine = create_and_register_engine(dburl, dbkey)
@@ -161,6 +163,7 @@ def admin(global_conf, dburl, dbkey, pkey, **kwargs):
         setSession(session)
         setLanguage('de')
         request = Request(environ)
+        alsoProvides(request, IBootstrapRequest)
         with Interaction():
             with transaction.manager as tm:
                 with SQLAlchemySession(engine, transaction_manager=tm):

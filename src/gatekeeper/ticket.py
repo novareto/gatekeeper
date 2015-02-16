@@ -10,7 +10,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5
 from cromlech.browser import exceptions
-from . import i18n as _ 
+from . import i18n as _
 
 
 class MissingTicket(exceptions.HTTPForbidden):
@@ -23,7 +23,7 @@ class TicketParseError(Exception):
     def __init__(self, ticket, msg=''):
         self.ticket = ticket
         self.msg = msg
-        
+
     def __str__(self):
         return _('Ticket parse error: %s (%s)') % (self.msg, self.ticket)
 
@@ -76,7 +76,7 @@ class AESCipher(object):
         iv = Random.new().read(AES.block_size)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
         length = AES.block_size - (len(data) % AES.block_size)
-        encrypted = iv + cipher.encrypt(self.pkcs1_pad(data))    
+        encrypted = iv + cipher.encrypt(self.pkcs1_pad(data))
         return encrypted
 
     def decrypt(self, data):
@@ -141,7 +141,7 @@ def parse_ticket(ticket, pubkey):
             fields['graceperiod'] = int(fields['graceperiod'])
         except ValueError:
             raise BadTicket(ticket, 'Bad value for graceperiod field')
-    
+
     return fields
 
 
@@ -212,7 +212,7 @@ class signed_cookie(object):
 
     def __init__(self, key):
         self.pubkey = read_key(key)
-    
+
     def __call__(self, func):
         def security_token_reader(request, *args):
             myticket = request.cookies.get('auth_pubtkt')
@@ -230,6 +230,6 @@ class signed_cookie(object):
                 request.environment['REMOTE_USER'] = user
                 request.environment['REMOTE_ACCESS'] = portals
                 return func(request, *args), None
-    
+
             return None, MissingTicket(location=None)
         return security_token_reader

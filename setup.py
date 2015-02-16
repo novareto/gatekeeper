@@ -34,6 +34,7 @@ setup(name='gatekeeper',
           "uvclight[sql]",
           "uvclight[auth]",
           "wsgistate",
+          "ul.auth",
       ],
       entry_points={
          'paste.app_factory': [

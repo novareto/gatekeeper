@@ -70,7 +70,7 @@ msgstr "Nachricht"
 
 #: ./admin.py:84
 msgid "Method of activation"
-msgstr ""
+msgstr "Aktivierungsmechanismuss"
 
 #. Default: "Password"
 #: ./login.py:50

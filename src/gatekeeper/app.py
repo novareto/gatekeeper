@@ -14,7 +14,6 @@ from uvclight.backends.sql import SQLAlchemySession, create_engine
 from zope.component import getUtility, getGlobalSiteManager
 from zope.location import Location
 
-from . import SESSION_KEY
 from gk.crypto import ticket as tlib
 from gk.backends import IPortal, XMLRPCPortal
 from gk.admin import Admin, get_valid_messages, styles
@@ -46,7 +45,7 @@ class GateKeeper(Location):
 
 
 def keeper(global_conf, pubkey, dburl,
-           zcml_file=None, portals=None, sessionkey="gatekeeper.session",
+           zcml_file=None, portals=None, session_key="gatekeeper.session",
            langs="en,de,fr", **kwargs):
 
     engine = create_engine(dburl, "admin")
@@ -75,14 +74,14 @@ def keeper(global_conf, pubkey, dburl,
 
     def publisher(environ, start_response):
 
-        @tlib.signed_cookie(pubkey, cipher_key)
+        @tlib.signed_cookie(pubkey)
         def publish(request, root):
             view = uvclight.query_view(request, site, name=u'index')
             if view is not None:
                 return view
             return uvclight.query_view(request, site, name=u'notfound'), None
 
-        session = environ[SESSION_KEY].session
+        session = environ[session_key].session
         setSession(session)
         request = Request(environ)
         view, error = publish(request, site)

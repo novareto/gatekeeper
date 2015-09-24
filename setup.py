@@ -35,20 +35,22 @@ setup(name='gatekeeper',
           "uvclight[auth]",
           "wsgistate",
           "ul.auth",
+          "gk.login",
+          "gk.layout",
+          "gk.admin",
+          "gk.backends",
+          "gk.crypto",
       ],
       entry_points={
          'paste.app_factory': [
              'keeper = gatekeeper.app:keeper',
-             'timeout = gatekeeper.login:timeout',
-             'login = gatekeeper.login:login',
-             'admin = gatekeeper.admin:admin',
-             'unauthorized = gatekeeper.login:unauthorized',
+             'timeout = gk.login:timeout',
+             'login = gk.login:login',
+             'admin = gk.admin:admin',
+             'unauthorized = gk.login:unauthorized',
          ],
          'paste.filter_factory': [
              'global_config = gatekeeper.utils:configuration',
-         ],
-         'paste.filter_app_factory': [
-             'cipher = gatekeeper.ticket:cipher',
          ],
       }
       )

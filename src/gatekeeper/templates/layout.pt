@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title tal:content="layout.title" />
+    <base tal:attributes="href request.script_name" />
+  </head>
+  <body>
+    <div class="container" id="siteheader">
+      <div id="header" class="row">
+	<div id="divLogo" class="col-md-4">
+	  <h1 id="logo">
+	    <a tal:attributes="href request.script_name">
+	      <img class="img-responsive" src="http://www.bgetem.de/logo.png" />
+	    </a>
+	  </h1>
+	</div>
+	<div class="pull-right hidden-xs" id="personalpreferences">
+	  <div id="userdropdown">
+	    <ul class="nav navbar-nav navbar-right">
+	      <li tal:condition="user">
+		<span class="glyphicon glyphicon-user"></span> 
+		<span tal:replace="user" />
+	      </li>
+	      <li tal:condition="not user">
+		<a href="login"
+		   ><i class="glyphicon glyphicon-lock"></i>
+		<span i18n:translate="">Please login</span></a>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+      <div id="navigation" class="row">
+	<nav class="navbar navbar-default" role="navigation">
+	  <div class="container-fluid">
+	    <div id="main-nav"
+		 class="collapse navbar-collapse navbar-nav-collapse">
+	      <ul class="nav navbar-nav">
+		<li class="active">
+		  <a href="">
+		  <span class="icon"> Home</span></a>
+		</li>
+	      </ul>
+	    </div>
+	  </div>
+	</nav>
+      </div>
+    </div>
+    <div class="container" id="main">
+      <div class="content">
+	<div tal:content="structure slot:top" />
+	<div tal:replace="structure content" />
+      </div>
+    </div>
+    <div id="footer" tal:content="structure slot:footer" />
+  </body>
+</html>

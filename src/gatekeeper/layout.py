@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import crom
-from dolmen.message import receive
 from zope.interface import Interface
 from dolmen.viewlet import ViewletManager, viewlet_manager
 from cromlech.i18n import getLocale

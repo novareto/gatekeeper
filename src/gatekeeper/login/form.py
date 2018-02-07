@@ -3,7 +3,6 @@
 import datetime
 import time
 import base64
-import socket
 
 from cromlech.browser import redirect_exception_response
 from cromlech.browser.exceptions import HTTPRedirect

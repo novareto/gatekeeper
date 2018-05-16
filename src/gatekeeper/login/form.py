@@ -49,14 +49,12 @@ class LogMe(Action):
 
         back = form.back(login)
         #log.debug(back)
-        print ("BACK BACK BACK %s" %back)
         res = HTTPFound(location=back)
         res.set_cookie('auth_pubtkt', quote(ticket), path='/',
-                       domain='kuvb.de', secure=True)
+                       domain=form.domain, secure=True)
         return res
 
     def __call__(self, form):
-        print ("START CALL")
         data, errors = form.extractData()
         print (data)
         print(errors)
@@ -69,7 +67,6 @@ class LogMe(Action):
         password = data.get('password')
 
         authenticated_for = form.authenticate(login, password)
-        print ("JAJAJAJAJAJ")
         if authenticated_for:
             send(_(u'Login successful.'))
             res = self.cook(
@@ -94,6 +91,11 @@ class BaseLoginForm(Form):
 
     def back(self, login):
         return self.context.dest
+
+    @property
+    def domain(self):
+        # Domain if it exists or 'back'
+        return getattr(self.context, 'domain', self.context.dest)
 
     def available(self):
         marker = True

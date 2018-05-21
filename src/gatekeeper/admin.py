@@ -129,3 +129,4 @@ def messager(engine):
                 result = response(environ, start_response)
         return result
 
+    return app

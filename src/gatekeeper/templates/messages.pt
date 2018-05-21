@@ -1,0 +1,8 @@
+<div id="messages">
+  <h1>Messages</h1>
+  <ul>
+    <li tal:repeat="msg iter(context)">
+      <span tal:content="msg" />
+    </li>
+  </ul>
+</div>

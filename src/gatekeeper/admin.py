@@ -16,9 +16,12 @@ from cromlech.dawnlight import ViewLookup, DawnlightPublisher
 from cromlech.sqlalchemy import SQLAlchemySession
 from cromlech.sqlalchemy import get_session
 from cromlech.webob import Response, Request
-from dolmen.forms.base import Action, Actions, Fields
+from dolmen.view import View, view_component
+from dolmen.forms.base import action, Action, Actions, Fields
+from dolmen.forms.base import FAILURE, SuccessMarker
+from dolmen.forms.base import form_component, name, context
 from dolmen.sqlcontainer import SQLContainer
-from . import query_view
+from . import Page, Form, query_view, tal_template
 
 
 view_lookup = ViewLookup(query_view)
@@ -105,6 +108,30 @@ class Message(Location, Messages):
 class MessagesRoot(SQLContainer):
     factory = model = Message
 
+
+@form_component
+@context(MessagesRoot)
+@name('add')
+class AddMessage(Form):
+    fields = Fields(IMessage).omit('id')
+
+    @action('Add')
+    def add(self):
+        data, errors = self.extractData()
+        if errors:
+            self.errors = errors
+            return FAILURE
+
+        item = Message(**data)
+        self.context.add(item)
+        return SuccessMarker('REDIRECT', True, self.request.script_name)
+
+
+@view_component
+@name('index')
+class MessagesList(Page):
+    template = tal_template('messages.pt')
+   
 
 def get_valid_messages(session):
     now = datetime.now()

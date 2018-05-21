@@ -80,7 +80,7 @@ class IMessage(Interface):
         required=False)
 
 
-class Message(Location, Admin):
+class Message(Location, Messages):
 
     __tablename__ = 'messages'
 

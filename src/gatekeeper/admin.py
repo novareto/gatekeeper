@@ -11,12 +11,12 @@ from zope.location import Location
 from zope.schema import Int, Choice, Text, Datetime
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
-from cromlech.dawnlight import traversable
+from cromlech.browser import IPublicationRoot
+from cromlech.dawnlight import view_lookup, DawnlightPublisher
 from cromlech.sqlalchemy import SQLAlchemySession
 from cromlech.sqlalchemy import get_session
 from cromlech.webob import Response, Request
 from dolmen.forms.base import Action, Actions, Fields
-from cromlech.location import get_absolute_url
 from dolmen.sqlcontainer import SQLContainer
 
 

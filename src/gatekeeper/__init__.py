@@ -12,6 +12,7 @@ from dolmen.template import TALTemplate
 from dolmen.view import View, make_layout_response
 from zope.i18nmessageid import MessageFactory
 from .login.interfaces import DirectResponse
+from .admin import messager, Messages
 
 
 i18n = MessageFactory("gatekeeper")

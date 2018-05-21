@@ -12,7 +12,6 @@ from zope.schema import Int, Choice, Text, Datetime
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
 from cromlech.dawnlight import traversable
-from cromlech.sqlalchemy import create_and_register_engine
 from cromlech.sqlalchemy import SQLAlchemySession
 from cromlech.sqlalchemy import get_session
 from cromlech.webob import Response, Request

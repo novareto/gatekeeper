@@ -106,6 +106,7 @@ class Message(Location, Messages):
 
 @implementer(IPublicationRoot)
 class MessagesRoot(SQLContainer):
+    displayMessages = False
     factory = model = Message
 
 

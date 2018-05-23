@@ -68,6 +68,14 @@
       </div>
     </div>
     <div class="container" id="main">
+      <div class="messages" tal:condition="context.displayMessages">
+	<ul tal:define="messages layout.get_messages()"
+	    tal:condition="messages">
+	  <li tal:repeat="message messages">
+	    <span tal:content="message" />
+	  </li>
+	</ul>
+      </div>
       <div class="content">
 	<div tal:content="structure slot:top" />
 	<div tal:replace="structure content" />

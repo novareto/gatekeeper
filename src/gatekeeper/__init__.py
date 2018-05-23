@@ -11,6 +11,7 @@ from cromlech.webob.request import Request
 from dolmen.template import TALTemplate
 from dolmen.forms.base import Form as BaseForm
 from dolmen.view import View, make_layout_response
+from dolmen.forms.ztk.widgets.date import DatetimeFieldWidget
 from zope.i18nmessageid import MessageFactory
 from .login.interfaces import DirectResponse
 
@@ -58,6 +59,16 @@ class Page(View):
 class Form(BaseForm):
     responseFactory = Response
     make_response = make_layout_response
+    template = tal_template('form.pt')
+
+    def updateWidgets(self):
+        BaseForm.updateWidgets(self)
+        for widget in self.fieldWidgets:
+            if not 'form-control' in widget.defaultHtmlClass:
+                widget.defaultHtmlClass += ['form-control']
+            if isinstance(widget, DatetimeFieldWidget):
+                widget.defaultHtmlAttributes.add('role')
+                widget._htmlAttributes['role'] = 'date'
 
 
 class DefaultLayer(ITypedRequest):
